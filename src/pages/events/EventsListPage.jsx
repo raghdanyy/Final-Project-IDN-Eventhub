@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
-import { Search, Plus } from 'lucide-react';
+import { GlobalSearchInput } from '../../components/common/GlobalSearchInput';
+import { Plus } from 'lucide-react';
 
 export const EventsListPage = () => {
   const navigate = useNavigate();
@@ -66,45 +67,11 @@ export const EventsListPage = () => {
         </div>
 
         <div className="page-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          {/* Search Box */}
-          <div
-            className="page-header-search"
-            style={{
-              position: 'relative',
-              display: 'flex',
-              alignItems: 'center',
-              width: '260px'
-            }}
-          >
-            <Search
-              size={16}
-              style={{
-                position: 'absolute',
-                left: '12px',
-                color: '#717680',
-                pointerEvents: 'none'
-              }}
-            />
-            <input
-              type="text"
-              placeholder="Cari event, order, attendee"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                width: '100%',
-                height: '40px',
-                padding: '0 12px 0 36px',
-                fontSize: '13px',
-                color: '#181D27',
-                backgroundColor: '#FFFFFF',
-                border: '1px solid #E9EAEB',
-                borderRadius: '8px',
-                outline: 'none'
-              }}
-              onFocus={(e) => (e.target.style.borderColor = '#FF7A00')}
-              onBlur={(e) => (e.target.style.borderColor = '#E9EAEB')}
-            />
-          </div>
+          {/* Universal Global Search Box */}
+          <GlobalSearchInput
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
 
           {/* Create Event Button */}
           <button
