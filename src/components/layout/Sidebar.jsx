@@ -29,6 +29,11 @@ export const Sidebar = ({ isOpen, onClose }) => {
           to: '/dashboard',
           label: 'Overview',
           icon: LayoutGrid
+        },
+        {
+          to: '/events',
+          label: 'My Event',
+          icon: Calendar
         }
       ]
     },

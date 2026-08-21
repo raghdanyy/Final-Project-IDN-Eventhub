@@ -338,8 +338,11 @@ export const AttendeesListPage = () => {
                 <th style={{ padding: '10px 12px', fontSize: '11px', fontWeight: '500', color: '#717680' }}>
                   KODE TIKET
                 </th>
-                <th style={{ padding: '10px 0 10px 12px', fontSize: '11px', fontWeight: '500', color: '#717680' }}>
+                <th style={{ padding: '10px 12px', fontSize: '11px', fontWeight: '500', color: '#717680' }}>
                   KEHADIRAN
+                </th>
+                <th style={{ padding: '10px 0 10px 12px', fontSize: '11px', fontWeight: '500', color: '#717680', textAlign: 'right' }}>
+                  AKSI
                 </th>
               </tr>
             </thead>
@@ -347,10 +350,8 @@ export const AttendeesListPage = () => {
               {filteredAttendees.map((att) => (
                 <tr
                   key={att.id}
-                  onClick={() => setSelectedAttendee(att)}
                   style={{
                     borderBottom: '1px solid #F8F9FA',
-                    cursor: 'pointer',
                     transition: 'background-color 0.15s ease'
                   }}
                   onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#FAFAFA')}
@@ -382,7 +383,7 @@ export const AttendeesListPage = () => {
                   </td>
 
                   {/* Kehadiran Column */}
-                  <td style={{ padding: '16px 0 16px 12px' }}>
+                  <td style={{ padding: '16px 12px' }}>
                     {att.isCheckedIn ? (
                       <span style={{ fontSize: '12px', fontWeight: '600', color: '#079455' }}>
                         Hadir · {att.checkInTime}
@@ -392,6 +393,69 @@ export const AttendeesListPage = () => {
                         Belum check-in
                       </span>
                     )}
+                  </td>
+
+                  {/* Outer Quick Action Icon Buttons */}
+                  <td style={{ padding: '16px 0 16px 12px', textAlign: 'right' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedAttendee(att)}
+                        style={{
+                          width: '30px',
+                          height: '30px',
+                          borderRadius: '6px',
+                          border: '1px solid #E9EAEB',
+                          backgroundColor: '#FFFFFF',
+                          color: '#414651',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer'
+                        }}
+                        title="Lihat Detail E-Ticket"
+                      >
+                        <Eye size={14} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleResendTicket(att)}
+                        style={{
+                          width: '30px',
+                          height: '30px',
+                          borderRadius: '6px',
+                          border: '1px solid #E9EAEB',
+                          backgroundColor: '#FFFFFF',
+                          color: '#006BFF',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer'
+                        }}
+                        title="Kirim QR Email"
+                      >
+                        <Send size={14} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleCheckIn(att.id)}
+                        style={{
+                          width: '30px',
+                          height: '30px',
+                          borderRadius: '6px',
+                          border: att.isCheckedIn ? '1px solid #FECDCA' : '1px solid #ABEFC6',
+                          backgroundColor: att.isCheckedIn ? '#FEF3F2' : '#ECFDF3',
+                          color: att.isCheckedIn ? '#D92D21' : '#079455',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer'
+                        }}
+                        title={att.isCheckedIn ? 'Batalkan Check-in' : 'Check-in Manual'}
+                      >
+                        <CheckCircle2 size={14} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

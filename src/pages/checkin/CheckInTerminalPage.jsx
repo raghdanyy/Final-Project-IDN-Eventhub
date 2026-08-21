@@ -68,6 +68,10 @@ export const CheckInTerminalPage = () => {
   const checkedInCount = activities.filter((a) => a.isCheckedIn).length;
   const notCheckedInCount = totalCount - checkedInCount;
 
+  const selectedParticipant = activities.find(
+    (a) => a.ticketCode.toUpperCase() === ticketInput.trim().toUpperCase() || a.name.toLowerCase().includes(ticketInput.trim().toLowerCase())
+  ) || activities[0];
+
   const handleCheckIn = (e) => {
     e?.preventDefault();
     if (!ticketInput.trim()) {
@@ -370,6 +374,132 @@ export const CheckInTerminalPage = () => {
               Gunakan kode dari e-ticket peserta. Contoh: <code>EVH-8823-PQ</code>
             </p>
           </form>
+
+          {/* Selected Attendee Biodata & QR Code Preview */}
+          {selectedParticipant && (
+            <div
+              style={{
+                marginTop: '24px',
+                paddingTop: '20px',
+                borderTop: '1px dashed #E9EAEB',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '14px'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: '12px', fontWeight: '700', color: '#FF7A00', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Biodata Peserta & QR Code
+                </span>
+                <span
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: '700',
+                    padding: '2px 8px',
+                    borderRadius: '12px',
+                    backgroundColor: selectedParticipant.isCheckedIn ? '#ECFDF3' : '#FFF8E6',
+                    color: selectedParticipant.isCheckedIn ? '#079455' : '#DC6903'
+                  }}
+                >
+                  {selectedParticipant.isCheckedIn ? '✓ HADIR (CHECK-IN)' : 'MENUNGGU VERIFIKASI'}
+                </span>
+              </div>
+
+              {/* Biodata Box */}
+              <div
+                style={{
+                  backgroundColor: '#F8F9FA',
+                  padding: '16px',
+                  borderRadius: '10px',
+                  border: '1px solid #E9EAEB',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                  fontSize: '13px'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ color: '#717680' }}>Nama Lengkap:</span>
+                  <span style={{ fontWeight: '700', color: '#181D27' }}>{selectedParticipant.name}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ color: '#717680' }}>Email:</span>
+                  <span style={{ fontWeight: '600', color: '#181D27' }}>{selectedParticipant.name.toLowerCase().replace(/\s+/g, '.')}@mail.com</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ color: '#717680' }}>Kode Tiket / QR:</span>
+                  <span style={{ fontWeight: '700', fontFamily: 'monospace', color: '#FF7A00' }}>{selectedParticipant.ticketCode}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ color: '#717680' }}>Tier Tiket:</span>
+                  <span style={{ fontWeight: '600', color: '#181D27' }}>{selectedParticipant.ticketTier}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ color: '#717680' }}>Status Pembayaran:</span>
+                  <span style={{ fontWeight: '700', color: '#079455' }}>LUNAS (Verified)</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ color: '#717680' }}>Nomor Seat / Zona:</span>
+                  <span style={{ fontWeight: '600', color: '#181D27' }}>Row A - Seat 14</span>
+                </div>
+              </div>
+
+              {/* QR Code Container */}
+              <div
+                style={{
+                  padding: '16px',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E9EAEB',
+                  borderRadius: '10px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '10px',
+                  textAlign: 'center'
+                }}
+              >
+                <div
+                  style={{
+                    padding: '12px',
+                    backgroundColor: '#F8F9FA',
+                    borderRadius: '12px',
+                    border: '1px solid #E9EAEB'
+                  }}
+                >
+                  <QrCode size={96} color="#181D27" />
+                </div>
+                <span style={{ fontSize: '12px', fontWeight: '700', fontFamily: 'monospace', color: '#181D27' }}>
+                  {selectedParticipant.ticketCode}
+                </span>
+
+                {!selectedParticipant.isCheckedIn && (
+                  <button
+                    type="button"
+                    onClick={handleCheckIn}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      borderRadius: '8px',
+                      backgroundColor: '#079455',
+                      color: '#FFFFFF',
+                      fontSize: '13px',
+                      fontWeight: '700',
+                      border: 'none',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      boxShadow: '0 1px 2px rgba(7, 148, 85, 0.2)'
+                    }}
+                  >
+                    <CheckCircle2 size={16} />
+                    <span>Verifikasi & Check-In Selesai</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Right: Aktivitas Check-in Card */}
@@ -389,7 +519,7 @@ export const CheckInTerminalPage = () => {
               marginBottom: '16px'
             }}
           >
-            Aktivitas check-in
+            Aktivitas check-in ({activities.length} Peserta)
           </h2>
 
           <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -406,7 +536,7 @@ export const CheckInTerminalPage = () => {
                   cursor: 'pointer',
                   transition: 'all 0.15s ease'
                 }}
-                title="Klik untuk mengisi kode ke form scan"
+                title="Klik untuk memilih peserta & lihat biodata"
               >
                 <div>
                   <div style={{ fontSize: '13px', fontWeight: '700', color: '#181D27', lineHeight: 1.3 }}>

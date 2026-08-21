@@ -132,6 +132,75 @@ export const AppProvider = ({ children }) => {
     showToast(`Tipe tiket "${newTicket.name}" berhasil disimpan!`, 'success');
   };
 
+  const updateTicketType = (ticketId, updateData) => {
+    setTicketTypes((prev) =>
+      prev.map((t) => (t.id === ticketId || String(t.id) === String(ticketId) ? { ...t, ...updateData } : t))
+    );
+    showToast('Tipe tiket berhasil diperbarui!', 'success');
+  };
+
+  const deleteTicketType = (ticketId) => {
+    setTicketTypes((prev) => prev.filter((t) => t.id !== ticketId && String(t.id) !== String(ticketId)));
+    showToast('Tipe tiket berhasil dihapus!', 'info');
+  };
+
+  // Actions: Orders & Auto-Add Attendees
+  const addOrder = (orderData) => {
+    const newOrder = {
+      id: `ORD-${Math.floor(24000 + Math.random() * 999)}`,
+      buyerName: orderData.buyerName || orderData.customer_name || 'Pembeli Baru',
+      buyerEmail: orderData.buyerEmail || orderData.customer_email || 'pembeli@mail.com',
+      event: orderData.event || 'Jakarta Tech Summit 2026',
+      qty: Number(orderData.qty) || 1,
+      time: new Date().toISOString().replace('T', ' ').substring(0, 16),
+      status: 'Lunas',
+      statusType: 'success',
+      total: orderData.total || 'Rp 750.000',
+      paymentMethod: orderData.paymentMethod || 'QRIS / GoPay',
+      ticketTier: orderData.ticketTier || 'Regular Pass (1x)'
+    };
+    setOrders((prev) => [newOrder, ...prev]);
+
+    // Auto add to Attendees
+    const newAtt = {
+      id: `att-${Date.now()}`,
+      name: newOrder.buyerName,
+      email: newOrder.buyerEmail,
+      phone: '+62 812-3456-7890',
+      event: newOrder.event,
+      ticketType: newOrder.ticketTier,
+      ticketCode: `EVH-${Math.floor(1000 + Math.random() * 9000)}-AUTO`,
+      isCheckedIn: false,
+      checkInTime: null,
+      seat: 'Row A - Auto'
+    };
+    setAttendees((prev) => [newAtt, ...prev]);
+
+    showToast(`Order ${newOrder.id} & Peserta ${newOrder.buyerName} berhasil dibuat!`, 'success');
+    return newOrder;
+  };
+
+  const addAttendee = (attData) => {
+    const newAtt = {
+      id: `att-${Date.now()}`,
+      phone: '+62 812-0000-0000',
+      ticketCode: `EVH-${Math.floor(1000 + Math.random() * 9000)}-NEW`,
+      isCheckedIn: false,
+      checkInTime: null,
+      seat: 'Row A - 01',
+      ...attData
+    };
+    setAttendees((prev) => [newAtt, ...prev]);
+    showToast(`Peserta baru ${newAtt.name} berhasil ditambahkan!`, 'success');
+    return newAtt;
+  };
+
+  const markNotificationAsRead = (notifId) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === notifId ? { ...n, isUnread: false } : n))
+    );
+  };
+
   // Actions: Promos
   const addPromoCode = (promoData) => {
     const newPromo = {
@@ -239,6 +308,11 @@ export const AppProvider = ({ children }) => {
         updateEvent,
         deleteEvent,
         addTicketType,
+        updateTicketType,
+        deleteTicketType,
+        addOrder,
+        addAttendee,
+        markNotificationAsRead,
         addPromoCode,
         updatePromoCode,
         deletePromoCode,

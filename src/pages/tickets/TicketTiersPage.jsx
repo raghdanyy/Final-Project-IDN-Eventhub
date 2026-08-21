@@ -2,16 +2,16 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { GlobalSearchInput } from '../../components/common/GlobalSearchInput';
-import { Plus, X, Calendar, Ticket, CheckCircle2, DollarSign, Users, Clock } from 'lucide-react';
+import { Plus, X, Calendar, Ticket, CheckCircle2, DollarSign, Users, Clock, Edit3, Share2, Trash2, Eye } from 'lucide-react';
 
 export const TicketTiersPage = () => {
   const navigate = useNavigate();
-  const { showToast } = useApp();
+  const { showToast, deleteTicketType } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTicket, setSelectedTicket] = useState(null);
 
   // 4 ticket types matching the Figma screenshot with full details
-  const ticketsList = [
+  const [localTickets, setLocalTickets] = useState([
     {
       id: 'tkt-01',
       name: 'Early Bird',
@@ -80,10 +80,24 @@ export const TicketTiersPage = () => {
       eventDate: '10 Agustus 2026',
       benefits: ['Akses Meetup & Panel Discussion', 'Snack & Beverage Box', 'Community Networking Room', 'Digital Event Guide']
     }
-  ];
+  ]);
+
+  const handleDeleteTicket = (tktId, tktName) => {
+    setLocalTickets((prev) => prev.filter((t) => t.id !== tktId));
+    if (deleteTicketType) deleteTicketType(tktId);
+    showToast(`Tipe tiket "${tktName}" berhasil dihapus!`, 'info');
+  };
+
+  const handleShareTicket = (tkt) => {
+    showToast(`Link pembelian tiket "${tkt.name}" berhasil disalin ke clipboard!`, 'success');
+  };
+
+  const handleEditTicket = (tkt) => {
+    setSelectedTicket(tkt);
+  };
 
   // Filter based on search
-  const filteredTickets = ticketsList.filter((tkt) => {
+  const filteredTickets = localTickets.filter((tkt) => {
     return (
       tkt.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       tkt.event.toLowerCase().includes(searchQuery.toLowerCase())
@@ -132,10 +146,10 @@ export const TicketTiersPage = () => {
               fontFamily: 'var(--font-family-display)'
             }}
           >
-            Tickets
+            Ticket Tiers
           </h1>
           <p style={{ fontSize: '13px', color: '#717680', marginTop: '2px' }}>
-            Tipe tiket seluruh event aktif
+            Manajemen kategori & harga tiket event
           </p>
         </div>
 
@@ -150,7 +164,7 @@ export const TicketTiersPage = () => {
           <button
             type="button"
             className="page-header-btn"
-            onClick={() => navigate('/events/new')}
+            onClick={() => showToast('Form pembuatan tipe tiket baru dibuka', 'info')}
             style={{
               height: '40px',
               padding: '0 16px',
@@ -173,7 +187,7 @@ export const TicketTiersPage = () => {
             onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#FF7A00')}
           >
             <Plus size={16} strokeWidth={2.5} />
-            <span>Create Event</span>
+            <span>Tambah Tiket</span>
           </button>
         </div>
       </div>
@@ -191,9 +205,6 @@ export const TicketTiersPage = () => {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
           <div style={{ fontSize: '14px', fontWeight: '700', color: '#181D27' }}>
             {filteredTickets.length} tipe tiket
-          </div>
-          <div style={{ fontSize: '12px', color: '#717680' }}>
-            💡 Klik baris tiket untuk melihat rincian detail
           </div>
         </div>
 
@@ -217,8 +228,11 @@ export const TicketTiersPage = () => {
                 <th style={{ padding: '10px 12px', fontSize: '11px', fontWeight: '500', color: '#717680' }}>
                   Penjualan berakhir
                 </th>
-                <th style={{ padding: '10px 0 10px 12px', fontSize: '11px', fontWeight: '500', color: '#717680', textAlign: 'right' }}>
+                <th style={{ padding: '10px 12px', fontSize: '11px', fontWeight: '500', color: '#717680' }}>
                   Status
+                </th>
+                <th style={{ padding: '10px 0 10px 12px', fontSize: '11px', fontWeight: '500', color: '#717680', textAlign: 'right' }}>
+                  Aksi
                 </th>
               </tr>
             </thead>
@@ -228,10 +242,8 @@ export const TicketTiersPage = () => {
                 return (
                   <tr
                     key={tkt.id}
-                    onClick={() => setSelectedTicket(tkt)}
                     style={{
                       borderBottom: '1px solid #F8F9FA',
-                      cursor: 'pointer',
                       transition: 'background-color 0.15s ease'
                     }}
                     onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#FAFAFA')}
@@ -269,7 +281,7 @@ export const TicketTiersPage = () => {
                               style={{
                                 width: `${tkt.soldPercent}%`,
                                 height: '100%',
-                                backgroundColor: '#006BFF',
+                                backgroundColor: '#FF7A00',
                                 borderRadius: '9999px'
                               }}
                             />
@@ -290,7 +302,7 @@ export const TicketTiersPage = () => {
                     </td>
 
                     {/* Status Column */}
-                    <td style={{ padding: '16px 0 16px 12px', textAlign: 'right' }}>
+                    <td style={{ padding: '16px 12px' }}>
                       <span
                         style={{
                           fontSize: '11px',
@@ -303,6 +315,88 @@ export const TicketTiersPage = () => {
                       >
                         {tkt.status}
                       </span>
+                    </td>
+
+                    {/* Outer Action Icon Buttons Column */}
+                    <td style={{ padding: '16px 0 16px 12px', textAlign: 'right' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedTicket(tkt)}
+                          style={{
+                            width: '30px',
+                            height: '30px',
+                            borderRadius: '6px',
+                            border: '1px solid #E9EAEB',
+                            backgroundColor: '#FFFFFF',
+                            color: '#414651',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer'
+                          }}
+                          title="Detail Tiket"
+                        >
+                          <Eye size={14} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleEditTicket(tkt)}
+                          style={{
+                            width: '30px',
+                            height: '30px',
+                            borderRadius: '6px',
+                            border: '1px solid #E9EAEB',
+                            backgroundColor: '#FFFFFF',
+                            color: '#006BFF',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer'
+                          }}
+                          title="Edit Tiket"
+                        >
+                          <Edit3 size={14} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleShareTicket(tkt)}
+                          style={{
+                            width: '30px',
+                            height: '30px',
+                            borderRadius: '6px',
+                            border: '1px solid #E9EAEB',
+                            backgroundColor: '#FFFFFF',
+                            color: '#079455',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer'
+                          }}
+                          title="Bagikan Link Tiket"
+                        >
+                          <Share2 size={14} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteTicket(tkt.id, tkt.name)}
+                          style={{
+                            width: '30px',
+                            height: '30px',
+                            borderRadius: '6px',
+                            border: '1px solid #FECDCA',
+                            backgroundColor: '#FEF3F2',
+                            color: '#D92D21',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer'
+                          }}
+                          title="Hapus Tiket"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
