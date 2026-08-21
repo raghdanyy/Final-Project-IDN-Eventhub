@@ -6,17 +6,19 @@ import { Plus, LogIn, LogOut, CheckCircle2, ShieldCheck } from 'lucide-react';
 
 export const AccountPage = () => {
   const navigate = useNavigate();
-  const { showToast } = useApp();
+  const { showToast, logout } = useApp();
   const [searchQuery, setSearchQuery] = React.useState('');
 
   const handleSwitchAccount = () => {
+    logout();
     showToast('Mengarahkan ke halaman login akun lain...', 'info');
     navigate('/login');
   };
 
   const handleSignOut = () => {
-    showToast('Anda telah keluar dari sesi dashboard.', 'info');
-    navigate('/login');
+    logout();
+    showToast('Anda telah keluar dari sesi dashboard. Mengalihkan ke Halaman Utama...', 'info');
+    navigate('/');
   };
 
   return (

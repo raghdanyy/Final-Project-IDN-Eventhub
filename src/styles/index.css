@@ -343,3 +343,110 @@ button {
   background-color: #D16400;
 }
 
+/* ==========================================================================
+   Landing Page Responsive Mobile Optimization (< 860px & < 480px)
+   ========================================================================== */
+
+.landing-burger-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-secondary);
+  background-color: var(--color-bg-card);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.landing-burger-btn:hover {
+  background-color: var(--color-bg-canvas);
+}
+
+@media (max-width: 860px) {
+  .nav-menu-desktop,
+  .nav-buttons-desktop {
+    display: none !important;
+  }
+
+  .landing-burger-btn {
+    display: flex !important;
+  }
+
+  .landing-hero-grid {
+    grid-template-columns: 1fr !important;
+    gap: 36px !important;
+  }
+
+  .landing-hero-title {
+    font-size: 30px !important;
+    line-height: 1.25 !important;
+  }
+
+  .landing-hero-subtitle {
+    font-size: 15px !important;
+  }
+
+  .landing-section-padding {
+    padding: 48px 16px !important;
+  }
+
+  .landing-section-title {
+    font-size: 24px !important;
+  }
+
+  .landing-comparison-grid,
+  .landing-ecosystem-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+
+  .landing-security-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 14px !important;
+  }
+
+  .landing-testimonials-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .landing-cta-banner {
+    padding: 40px 20px !important;
+  }
+
+  .landing-cta-title {
+    font-size: 24px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .landing-hero-title {
+    font-size: 25px !important;
+  }
+
+  .landing-cta-group {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+  }
+
+  .landing-cta-group button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .landing-security-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .landing-footer-container {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 16px !important;
+  }
+}
+

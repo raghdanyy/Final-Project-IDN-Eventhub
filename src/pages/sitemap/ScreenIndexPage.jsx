@@ -24,6 +24,18 @@ export const ScreenIndexPage = () => {
 
   const screenGroups = [
     {
+      group: '0. Landing Page (Public Entrypoint)',
+      icon: Compass,
+      screens: [
+        {
+          name: 'Landing Page EventHub',
+          path: '/',
+          file: 'src/pages/landing/LandingPage.jsx',
+          desc: 'Halaman utama publik, hero banner, komparasi, fitur utama, ekosistem & FAQ'
+        }
+      ]
+    },
+    {
       group: '1. Autentikasi & Onboarding (PRD Feature 1)',
       icon: Lock,
       screens: [

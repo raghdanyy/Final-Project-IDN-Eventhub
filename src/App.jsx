@@ -5,6 +5,9 @@ import { AppProvider } from './context/AppContext';
 // Layout
 import { AppLayout } from './components/layout/AppLayout';
 
+// Landing Page
+import { LandingPage } from './pages/landing/LandingPage';
+
 // Pages
 import { DashboardOverviewPage } from './pages/dashboard/DashboardOverviewPage';
 import { EventsListPage } from './pages/events/EventsListPage';
@@ -29,11 +32,26 @@ import { RegisterPage } from './pages/auth/RegisterPage';
 import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage';
 import { OnboardingPage } from './pages/auth/OnboardingPage';
 
+import { useApp } from './context/AppContext';
+
+// Auth Protection Component
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, showToast } = useApp();
+  if (!isAuthenticated) {
+    showToast('Silakan masuk terlebih dahulu untuk mengakses dashboard.', 'warning');
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
+
 function App() {
   return (
     <AppProvider>
       <BrowserRouter>
         <Routes>
+          {/* Public Landing Page */}
+          <Route path="/" element={<LandingPage />} />
+
           {/* Public Auth Routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
@@ -41,8 +59,14 @@ function App() {
           <Route path="/onboarding" element={<OnboardingPage />} />
 
           {/* Authenticated Dashboard App Routes */}
-          <Route element={<AppLayout />}>
-            <Route path="/" element={<DashboardOverviewPage />} />
+          <Route
+            element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="/dashboard" element={<DashboardOverviewPage />} />
             <Route path="/events" element={<EventsListPage />} />
             <Route path="/events/new" element={<CreateEventWizardPage />} />
             <Route path="/events/:id" element={<EventDetailPage />} />

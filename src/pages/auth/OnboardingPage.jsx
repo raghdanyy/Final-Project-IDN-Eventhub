@@ -17,7 +17,7 @@ export const OnboardingPage = () => {
     e.preventDefault();
     if (!orgName.trim()) return;
     showToast(`Organisasi "${orgName}" berhasil dibuat!`, 'success');
-    navigate('/');
+    navigate('/dashboard');
   };
 
   return (

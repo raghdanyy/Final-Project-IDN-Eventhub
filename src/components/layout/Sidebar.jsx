@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { useApp } from '../../context/AppContext';
 import {
   LayoutGrid,
   Calendar,
@@ -12,18 +13,20 @@ import {
   Bell,
   Settings,
   UserCircle,
+  LogOut,
   X
 } from 'lucide-react';
 
 export const Sidebar = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
+  const { logout, showToast } = useApp();
 
   const navSections = [
     {
       title: 'Overview',
       items: [
         {
-          to: '/',
+          to: '/dashboard',
           label: 'Overview',
           icon: LayoutGrid
         }
@@ -257,48 +260,96 @@ export const Sidebar = ({ isOpen, onClose }) => {
           ))}
         </nav>
 
-        {/* 3. Bottom User Profile */}
+        {/* 3. Bottom User Profile & Sign Out */}
         <div
-          onClick={() => {
-            if (onClose) onClose();
-            navigate('/account');
-          }}
           style={{
-            padding: '16px 20px',
+            padding: '14px 16px',
             borderTop: '1px solid #E9EAEB',
             display: 'flex',
             alignItems: 'center',
-            gap: '10px',
-            cursor: 'pointer',
-            transition: 'background-color 0.15s ease'
+            justifyContent: 'space-between',
+            gap: '8px'
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#FAFAFA')}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
         >
           <div
+            onClick={() => {
+              if (onClose) onClose();
+              navigate('/account');
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              cursor: 'pointer',
+              flex: 1,
+              padding: '4px',
+              borderRadius: '8px',
+              transition: 'background-color 0.15s ease'
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#FAFAFA')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+          >
+            <div
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                backgroundColor: '#D0E2FF',
+                color: '#0043CE',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '13px',
+                fontWeight: '700'
+              }}
+            >
+              A
+            </div>
+            <div>
+              <div style={{ fontSize: '13px', fontWeight: '700', color: '#181D27', lineHeight: 1.2 }}>
+                Alex Pratama
+              </div>
+              <div style={{ fontSize: '11px', color: '#717680' }}>
+                Owner
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            title="Sign Out ke Landing Page"
+            onClick={() => {
+              if (onClose) onClose();
+              logout();
+              showToast('Anda telah keluar dari sesi dashboard. Mengalihkan ke Halaman Utama...', 'info');
+              navigate('/');
+            }}
             style={{
               width: '32px',
               height: '32px',
-              borderRadius: '50%',
-              backgroundColor: '#D0E2FF',
-              color: '#0043CE',
+              borderRadius: '8px',
+              border: '1px solid #E9EAEB',
+              backgroundColor: '#FFFFFF',
+              color: '#717680',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '13px',
-              fontWeight: '700'
+              cursor: 'pointer',
+              transition: 'all 0.15s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#FEF3F2';
+              e.currentTarget.style.color = '#D92D20';
+              e.currentTarget.style.borderColor = '#FDA29B';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#FFFFFF';
+              e.currentTarget.style.color = '#717680';
+              e.currentTarget.style.borderColor = '#E9EAEB';
             }}
           >
-            A
-          </div>
-          <div>
-            <div style={{ fontSize: '13px', fontWeight: '700', color: '#181D27', lineHeight: 1.2 }}>
-              Alex Pratama
-            </div>
-            <div style={{ fontSize: '11px', color: '#717680' }}>
-              Owner
-            </div>
-          </div>
+            <LogOut size={16} />
+          </button>
         </div>
       </aside>
     </>

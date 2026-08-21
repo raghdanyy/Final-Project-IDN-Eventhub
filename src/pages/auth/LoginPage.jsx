@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
-import { Mail, Lock, Check } from 'lucide-react';
+import { Mail, Lock, Check, ArrowLeft } from 'lucide-react';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
-  const { showToast } = useApp();
+  const { showToast, login } = useApp();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -13,13 +13,15 @@ export const LoginPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    login();
     showToast('Login berhasil! Mengalihkan ke dashboard...', 'success');
-    navigate('/');
+    navigate('/dashboard');
   };
 
   const handleSocialLogin = (provider) => {
+    login();
     showToast(`Masuk dengan ${provider} berhasil!`, 'success');
-    navigate('/');
+    navigate('/dashboard');
   };
 
   return (
@@ -37,8 +39,32 @@ export const LoginPage = () => {
     >
       <div style={{ width: '100%', maxWidth: '440px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         
-        {/* 1. App Icon Badge (Orange Rounded Box with White 'E') */}
+        {/* Back to Landing Page Link */}
+        <Link
+          to="/"
+          style={{
+            alignSelf: 'flex-start',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            fontSize: '13px',
+            fontWeight: 600,
+            color: 'var(--color-text-secondary)',
+            marginBottom: '20px',
+            textDecoration: 'none',
+            padding: '6px 12px',
+            borderRadius: 'var(--radius-pill)',
+            backgroundColor: 'var(--color-bg-canvas)',
+            border: '1px solid var(--color-border-secondary)',
+            transition: 'all 0.15s ease'
+          }}
+        >
+          <ArrowLeft size={16} /> Kembali ke Landing Page
+        </Link>
+
+        {/* 1. App Icon Badge (Clickable to go home) */}
         <div
+          onClick={() => navigate('/')}
           style={{
             width: '48px',
             height: '48px',
@@ -48,7 +74,8 @@ export const LoginPage = () => {
             alignItems: 'center',
             justifyContent: 'center',
             boxShadow: '0 4px 14px rgba(255, 122, 0, 0.28)',
-            marginBottom: '20px'
+            marginBottom: '20px',
+            cursor: 'pointer'
           }}
         >
           <span

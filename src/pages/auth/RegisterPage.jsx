@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
-import { Mail, Lock, User, Building, Check } from 'lucide-react';
+import { Mail, Lock, User, Building, Check, ArrowLeft } from 'lucide-react';
 
 export const RegisterPage = () => {
   const navigate = useNavigate();
-  const { showToast } = useApp();
+  const { showToast, login } = useApp();
   
   const [name, setName] = useState('');
   const [orgName, setOrgName] = useState('');
@@ -19,13 +19,15 @@ export const RegisterPage = () => {
       showToast('Harap setujui Syarat & Ketentuan untuk melanjutkan.', 'warning');
       return;
     }
+    login();
     showToast(`Registrasi berhasil! Selamat datang, ${name || 'Organizer'}.`, 'success');
-    navigate('/');
+    navigate('/dashboard');
   };
 
   const handleSocialRegister = (provider) => {
+    login();
     showToast(`Daftar dengan ${provider} berhasil!`, 'success');
-    navigate('/');
+    navigate('/dashboard');
   };
 
   return (
@@ -43,8 +45,32 @@ export const RegisterPage = () => {
     >
       <div style={{ width: '100%', maxWidth: '440px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         
-        {/* 1. App Icon Badge (Orange Rounded Box with White 'E') */}
+        {/* Back to Landing Page Link */}
+        <Link
+          to="/"
+          style={{
+            alignSelf: 'flex-start',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            fontSize: '13px',
+            fontWeight: 600,
+            color: 'var(--color-text-secondary)',
+            marginBottom: '20px',
+            textDecoration: 'none',
+            padding: '6px 12px',
+            borderRadius: 'var(--radius-pill)',
+            backgroundColor: 'var(--color-bg-canvas)',
+            border: '1px solid var(--color-border-secondary)',
+            transition: 'all 0.15s ease'
+          }}
+        >
+          <ArrowLeft size={16} /> Kembali ke Landing Page
+        </Link>
+
+        {/* 1. App Icon Badge (Clickable to go home) */}
         <div
+          onClick={() => navigate('/')}
           style={{
             width: '48px',
             height: '48px',
@@ -54,7 +80,8 @@ export const RegisterPage = () => {
             alignItems: 'center',
             justifyContent: 'center',
             boxShadow: '0 4px 14px rgba(255, 122, 0, 0.28)',
-            marginBottom: '20px'
+            marginBottom: '20px',
+            cursor: 'pointer'
           }}
         >
           <span

@@ -59,7 +59,7 @@ export const AppLayout = () => {
 
             {/* Brand Logo & Name */}
             <div
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/dashboard')}
               style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
             >
               <div

@@ -15,6 +15,21 @@ export const AppProvider = ({ children }) => {
   const [organization, setOrganization] = useState(() => db.getOrganization());
   const [salesChartData, setSalesChartData] = useState(() => db.getSalesChartData());
 
+  // Auth State
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem('eventhub_auth') === 'true';
+  });
+
+  const login = () => {
+    setIsAuthenticated(true);
+    localStorage.setItem('eventhub_auth', 'true');
+  };
+
+  const logout = () => {
+    setIsAuthenticated(false);
+    localStorage.setItem('eventhub_auth', 'false');
+  };
+
   const [selectedEventId, setSelectedEventId] = useState(() => {
     const evts = db.getEvents();
     return evts.length > 0 ? evts[0].id : 'evt-1';
@@ -190,6 +205,11 @@ export const AppProvider = ({ children }) => {
   return (
     <AppContext.Provider
       value={{
+        // Auth State & Actions
+        isAuthenticated,
+        login,
+        logout,
+
         // State
         events,
         setEvents,
