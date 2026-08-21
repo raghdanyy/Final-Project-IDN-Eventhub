@@ -177,11 +177,11 @@ export const AttendeesListPage = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
 
-          {/* Create Event Button */}
+          {/* Add New Attendee Button */}
           <button
             type="button"
             className="page-header-btn"
-            onClick={() => navigate('/events/new')}
+            onClick={() => setShowAddModal(true)}
             style={{
               height: '40px',
               padding: '0 16px',
@@ -204,7 +204,7 @@ export const AttendeesListPage = () => {
             onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#FF7A00')}
           >
             <Plus size={16} strokeWidth={2.5} />
-            <span>Create Event</span>
+            <span>Tambah Peserta Baru</span>
           </button>
         </div>
       </div>

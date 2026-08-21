@@ -254,31 +254,6 @@ export const AppLayout = () => {
                 </div>
               )}
             </div>
-
-            {/* Quick Create Event Button */}
-            <button
-              type="button"
-              onClick={() => navigate('/events/new')}
-              style={{
-                height: '36px',
-                padding: '0 12px',
-                borderRadius: '8px',
-                backgroundColor: '#FF7A00',
-                border: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                color: '#FFFFFF',
-                fontSize: '13px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                boxShadow: '0 1px 2px rgba(255, 122, 0, 0.2)'
-              }}
-              title="Buat Event Baru"
-            >
-              <Plus size={16} strokeWidth={2.5} />
-              <span className="hide-on-mobile">Buat Event</span>
-            </button>
           </div>
         </header>
 

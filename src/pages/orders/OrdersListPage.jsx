@@ -295,7 +295,7 @@ export const OrdersListPage = () => {
             }}
           >
             <Plus size={16} strokeWidth={2.5} />
-            <span>+ Buat Pesanan Baru</span>
+            <span>Create New Order</span>
           </button>
         </div>
       </div>
