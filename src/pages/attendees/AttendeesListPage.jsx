@@ -2,13 +2,24 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { GlobalSearchInput } from '../../components/common/GlobalSearchInput';
-import { Plus, X, QrCode, Mail, CheckCircle2, User, Ticket, Clock, Send } from 'lucide-react';
+import { Plus, X, QrCode, Mail, CheckCircle2, User, Ticket, Clock, Send, Eye, Filter, ArrowUpDown } from 'lucide-react';
 
 export const AttendeesListPage = () => {
   const navigate = useNavigate();
-  const { showToast } = useApp();
+  const { showToast, attendees: globalAttendees, addAttendee } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedAttendee, setSelectedAttendee] = useState(null);
+  const [eventFilter, setEventFilter] = useState('ALL');
+  const [sortBy, setSortBy] = useState('name-asc');
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newAttendee, setNewAttendee] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    event: 'Jakarta Tech Summit 2026',
+    ticketType: 'Regular Pass',
+    seat: 'Row A - 01'
+  });
 
   // 6 attendees matching the Figma screenshot
   const [attendeesList, setAttendeesList] = useState([
@@ -77,7 +88,7 @@ export const AttendeesListPage = () => {
       name: 'Fajar Nugroho',
       email: 'fajar@mail.com',
       phone: '+62 818-5566-7788',
-      event: 'Jakarta Tech Summit 2026',
+      event: 'AI Builders Bootcamp',
       ticketType: 'Early Bird',
       ticketCode: 'EVH-8826-QW',
       isCheckedIn: false,
@@ -86,24 +97,66 @@ export const AttendeesListPage = () => {
     }
   ]);
 
+  // Combine local and global attendees
+  const combinedAttendees = globalAttendees && globalAttendees.length > 0 ? globalAttendees : attendeesList;
+
   // Dynamic Metrics
-  const totalAttendees = attendeesList.length;
-  const checkedInCount = attendeesList.filter((a) => a.isCheckedIn).length;
+  const totalAttendees = combinedAttendees.length;
+  const checkedInCount = combinedAttendees.filter((a) => a.isCheckedIn).length;
   const notCheckedInCount = totalAttendees - checkedInCount;
-  const attendanceRate = Math.round((checkedInCount / totalAttendees) * 100);
+  const attendanceRate = totalAttendees > 0 ? Math.round((checkedInCount / totalAttendees) * 100) : 0;
 
-  // Filter based on search query
-  const filteredAttendees = attendeesList.filter((att) => {
-    return (
-      att.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      att.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      att.ticketCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      att.event.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      att.ticketType.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  });
+  // Filter based on search query, event filter, and sort
+  const filteredAttendees = combinedAttendees
+    .filter((att) => {
+      const matchesSearch =
+        att.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        att.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        att.ticketCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        att.event.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (att.ticketType && att.ticketType.toLowerCase().includes(searchQuery.toLowerCase()));
+      const matchesEvent = eventFilter === 'ALL' || att.event === eventFilter;
+      return matchesSearch && matchesEvent;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'name-asc') return a.name.localeCompare(b.name);
+      if (sortBy === 'name-desc') return b.name.localeCompare(a.name);
+      if (sortBy === 'checkin-first') return (b.isCheckedIn ? 1 : 0) - (a.isCheckedIn ? 1 : 0);
+      return 0;
+    });
 
-  const toggleManualCheckIn = (attId) => {
+  const handleAddSubmit = (e) => {
+    e.preventDefault();
+    if (!newAttendee.name.trim() || !newAttendee.email.trim()) {
+      showToast('Harap isi nama dan email peserta!', 'warning');
+      return;
+    }
+    const created = {
+      name: newAttendee.name,
+      email: newAttendee.email,
+      phone: newAttendee.phone || '+62 812-0000-0000',
+      event: newAttendee.event,
+      ticketType: newAttendee.ticketType,
+      seat: newAttendee.seat || 'Row A - 01'
+    };
+    if (addAttendee) {
+      addAttendee(created);
+    } else {
+      setAttendeesList((prev) => [{ ...created, id: `att-${Date.now()}`, ticketCode: `EVH-${Math.floor(1000 + Math.random() * 9000)}-NEW`, isCheckedIn: false, checkInTime: null }, ...prev]);
+      showToast(`Peserta baru ${created.name} berhasil ditambahkan!`, 'success');
+    }
+    setShowAddModal(false);
+    setNewAttendee({
+      name: '',
+      email: '',
+      phone: '',
+      event: 'Jakarta Tech Summit 2026',
+      ticketType: 'Regular Pass',
+      seat: 'Row A - 01'
+    });
+  };
+
+  const handleToggleCheckIn = (attId) => {
     const now = new Date();
     const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     
