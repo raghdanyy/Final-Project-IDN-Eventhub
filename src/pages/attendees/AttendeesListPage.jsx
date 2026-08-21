@@ -2,24 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { GlobalSearchInput } from '../../components/common/GlobalSearchInput';
-import { Plus, X, QrCode, Mail, CheckCircle2, User, Ticket, Clock, Send, Eye, Filter, ArrowUpDown } from 'lucide-react';
+import { Plus, X, QrCode, Mail, CheckCircle2, User, Ticket, Clock, Send } from 'lucide-react';
 
 export const AttendeesListPage = () => {
   const navigate = useNavigate();
-  const { showToast, attendees: globalAttendees, addAttendee } = useApp();
+  const { showToast } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedAttendee, setSelectedAttendee] = useState(null);
-  const [eventFilter, setEventFilter] = useState('ALL');
-  const [sortBy, setSortBy] = useState('name-asc');
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [newAttendee, setNewAttendee] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    event: 'Jakarta Tech Summit 2026',
-    ticketType: 'Regular Pass',
-    seat: 'Row A - 01'
-  });
 
   // 6 attendees matching the Figma screenshot
   const [attendeesList, setAttendeesList] = useState([
@@ -88,7 +77,7 @@ export const AttendeesListPage = () => {
       name: 'Fajar Nugroho',
       email: 'fajar@mail.com',
       phone: '+62 818-5566-7788',
-      event: 'AI Builders Bootcamp',
+      event: 'Jakarta Tech Summit 2026',
       ticketType: 'Early Bird',
       ticketCode: 'EVH-8826-QW',
       isCheckedIn: false,
@@ -97,66 +86,24 @@ export const AttendeesListPage = () => {
     }
   ]);
 
-  // Combine local and global attendees
-  const combinedAttendees = globalAttendees && globalAttendees.length > 0 ? globalAttendees : attendeesList;
-
   // Dynamic Metrics
-  const totalAttendees = combinedAttendees.length;
-  const checkedInCount = combinedAttendees.filter((a) => a.isCheckedIn).length;
+  const totalAttendees = attendeesList.length;
+  const checkedInCount = attendeesList.filter((a) => a.isCheckedIn).length;
   const notCheckedInCount = totalAttendees - checkedInCount;
-  const attendanceRate = totalAttendees > 0 ? Math.round((checkedInCount / totalAttendees) * 100) : 0;
+  const attendanceRate = Math.round((checkedInCount / totalAttendees) * 100);
 
-  // Filter based on search query, event filter, and sort
-  const filteredAttendees = combinedAttendees
-    .filter((att) => {
-      const matchesSearch =
-        att.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        att.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        att.ticketCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        att.event.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (att.ticketType && att.ticketType.toLowerCase().includes(searchQuery.toLowerCase()));
-      const matchesEvent = eventFilter === 'ALL' || att.event === eventFilter;
-      return matchesSearch && matchesEvent;
-    })
-    .sort((a, b) => {
-      if (sortBy === 'name-asc') return a.name.localeCompare(b.name);
-      if (sortBy === 'name-desc') return b.name.localeCompare(a.name);
-      if (sortBy === 'checkin-first') return (b.isCheckedIn ? 1 : 0) - (a.isCheckedIn ? 1 : 0);
-      return 0;
-    });
+  // Filter based on search query
+  const filteredAttendees = attendeesList.filter((att) => {
+    return (
+      att.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      att.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      att.ticketCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      att.event.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      att.ticketType.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  });
 
-  const handleAddSubmit = (e) => {
-    e.preventDefault();
-    if (!newAttendee.name.trim() || !newAttendee.email.trim()) {
-      showToast('Harap isi nama dan email peserta!', 'warning');
-      return;
-    }
-    const created = {
-      name: newAttendee.name,
-      email: newAttendee.email,
-      phone: newAttendee.phone || '+62 812-0000-0000',
-      event: newAttendee.event,
-      ticketType: newAttendee.ticketType,
-      seat: newAttendee.seat || 'Row A - 01'
-    };
-    if (addAttendee) {
-      addAttendee(created);
-    } else {
-      setAttendeesList((prev) => [{ ...created, id: `att-${Date.now()}`, ticketCode: `EVH-${Math.floor(1000 + Math.random() * 9000)}-NEW`, isCheckedIn: false, checkInTime: null }, ...prev]);
-      showToast(`Peserta baru ${created.name} berhasil ditambahkan!`, 'success');
-    }
-    setShowAddModal(false);
-    setNewAttendee({
-      name: '',
-      email: '',
-      phone: '',
-      event: 'Jakarta Tech Summit 2026',
-      ticketType: 'Regular Pass',
-      seat: 'Row A - 01'
-    });
-  };
-
-  const handleToggleCheckIn = (attId) => {
+  const toggleManualCheckIn = (attId) => {
     const now = new Date();
     const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     
@@ -230,11 +177,11 @@ export const AttendeesListPage = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
 
-          {/* Add New Attendee Button */}
+          {/* Create Event Button */}
           <button
             type="button"
             className="page-header-btn"
-            onClick={() => setShowAddModal(true)}
+            onClick={() => navigate('/events/new')}
             style={{
               height: '40px',
               padding: '0 16px',
@@ -257,7 +204,7 @@ export const AttendeesListPage = () => {
             onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#FF7A00')}
           >
             <Plus size={16} strokeWidth={2.5} />
-            <span>Tambah Peserta Baru</span>
+            <span>Create Event</span>
           </button>
         </div>
       </div>
@@ -391,11 +338,8 @@ export const AttendeesListPage = () => {
                 <th style={{ padding: '10px 12px', fontSize: '11px', fontWeight: '500', color: '#717680' }}>
                   KODE TIKET
                 </th>
-                <th style={{ padding: '10px 12px', fontSize: '11px', fontWeight: '500', color: '#717680' }}>
+                <th style={{ padding: '10px 0 10px 12px', fontSize: '11px', fontWeight: '500', color: '#717680' }}>
                   KEHADIRAN
-                </th>
-                <th style={{ padding: '10px 0 10px 12px', fontSize: '11px', fontWeight: '500', color: '#717680', textAlign: 'right' }}>
-                  AKSI
                 </th>
               </tr>
             </thead>
@@ -403,8 +347,10 @@ export const AttendeesListPage = () => {
               {filteredAttendees.map((att) => (
                 <tr
                   key={att.id}
+                  onClick={() => setSelectedAttendee(att)}
                   style={{
                     borderBottom: '1px solid #F8F9FA',
+                    cursor: 'pointer',
                     transition: 'background-color 0.15s ease'
                   }}
                   onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#FAFAFA')}
@@ -436,7 +382,7 @@ export const AttendeesListPage = () => {
                   </td>
 
                   {/* Kehadiran Column */}
-                  <td style={{ padding: '16px 12px' }}>
+                  <td style={{ padding: '16px 0 16px 12px' }}>
                     {att.isCheckedIn ? (
                       <span style={{ fontSize: '12px', fontWeight: '600', color: '#079455' }}>
                         Hadir · {att.checkInTime}
@@ -446,69 +392,6 @@ export const AttendeesListPage = () => {
                         Belum check-in
                       </span>
                     )}
-                  </td>
-
-                  {/* Outer Quick Action Icon Buttons */}
-                  <td style={{ padding: '16px 0 16px 12px', textAlign: 'right' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}>
-                      <button
-                        type="button"
-                        onClick={() => setSelectedAttendee(att)}
-                        style={{
-                          width: '30px',
-                          height: '30px',
-                          borderRadius: '6px',
-                          border: '1px solid #E9EAEB',
-                          backgroundColor: '#FFFFFF',
-                          color: '#414651',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          cursor: 'pointer'
-                        }}
-                        title="Lihat Detail E-Ticket"
-                      >
-                        <Eye size={14} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleResendTicket(att)}
-                        style={{
-                          width: '30px',
-                          height: '30px',
-                          borderRadius: '6px',
-                          border: '1px solid #E9EAEB',
-                          backgroundColor: '#FFFFFF',
-                          color: '#006BFF',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          cursor: 'pointer'
-                        }}
-                        title="Kirim QR Email"
-                      >
-                        <Send size={14} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleToggleCheckIn(att.id)}
-                        style={{
-                          width: '30px',
-                          height: '30px',
-                          borderRadius: '6px',
-                          border: att.isCheckedIn ? '1px solid #FECDCA' : '1px solid #ABEFC6',
-                          backgroundColor: att.isCheckedIn ? '#FEF3F2' : '#ECFDF3',
-                          color: att.isCheckedIn ? '#D92D21' : '#079455',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          cursor: 'pointer'
-                        }}
-                        title={att.isCheckedIn ? 'Batalkan Check-in' : 'Check-in Manual'}
-                      >
-                        <CheckCircle2 size={14} />
-                      </button>
-                    </div>
                   </td>
                 </tr>
               ))}
